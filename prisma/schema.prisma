@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Video {
+  id        String @id @default(uuid())
+  cutlabsId String @unique
+  title     String
+  url       String @unique
+  status    String //Transcribing Completed
+  clips     Clip[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("video")
+}
+
+model Clip {
+  id            String @id @default(uuid())
+  videoId       String
+  video         Video  @relation(fields: [videoId], references: [id])
+  cutlabsId     String @unique
+  title         String
+  description   String
+  status        String
+  viralityScore Int
+  sedDuration   Int
+  posts         Post[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("clip")
+}
+
+model Post {
+  id       String @id @default(uuid())
+  platform String
+  clipId   String
+  clip     Clip   @relation(fields: [clipId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("post")
+}
