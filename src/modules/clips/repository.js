@@ -1,16 +1,29 @@
 const prismaClient = require("../../database/prismaClient");
 
-async function createMany(data) {
-  await prismaClient.clip.createMany({
-    data
-  })
-  return prismaClient.clip.findMany({
+async function createManyIfNotExists(data) {
+  const existent = await prismaClient.clip.findMany({
     where: {
       cutlabsId: {
         in: data.map(e => e.cutlabsId)
       }
     }
-  })
+  });
+
+  const toCreate = data.filter(d => !existent.find(e => e.cutlabsId === d.cutlabsId));
+  const created = await prismaClient.clip.createManyAndReturn({
+    data: toCreate
+  });
+  
+  const notDownloadedItems = await prismaClient.clip.findMany({
+    where: {
+      cutlabsId: {
+        in: ids
+      },
+      status: { not: 'downloaded'}
+    }
+  });
+
+  return [...created, ...notDownloadedItems];
 }
 
 async function updateStatus(id, newStatus) {
@@ -19,7 +32,7 @@ async function updateStatus(id, newStatus) {
       id
     },
     data: {
-      state: newStatus
+      status: newStatus
     }
   })
 }
@@ -33,7 +46,7 @@ async function findMany({ status } = {}) {
 }
 
 module.exports = {
-  createMany,
+  createManyIfNotExists,
   updateStatus,
   findMany
 };

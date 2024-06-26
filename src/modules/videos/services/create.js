@@ -14,7 +14,7 @@ async function create({ url, cutlabsId }) {
 
   const { project, processingState } = await cutlabsApi.getProject(cutlabsId);
 
-  const createdVideo = await videoRepository.create({
+  const createdVideo = await videoRepository.createIfNotExists({
     cutlabsId,
     title: project.title,
     url: project.inputUrl,
