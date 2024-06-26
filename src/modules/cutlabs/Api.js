@@ -18,7 +18,7 @@ class CutlabsApi {
       method: 'GET',
       responseType: 'stream'
     });
-    const outputPath = path.join(__dirname, '../../data/pending');
+    const outputPath = path.join(__dirname, '../../../data/pending');
 
     const writer = fs.createWriteStream(`${outputPath}/${id}.mp4`);
 
