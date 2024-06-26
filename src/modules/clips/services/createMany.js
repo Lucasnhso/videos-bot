@@ -10,7 +10,7 @@ async function createMany(videoCutlabsId, data) {
     throw new Error('Video not exists on db');
   }
 
-  const clips = await clipRepository.createMany(data.map(e => ({
+  const clips = await clipRepository.createManyIfNotExists(data.map(e => ({
     videoId: video.id,
     cutlabsId: e.uuid,
     title: e.title,
@@ -20,15 +20,16 @@ async function createMany(videoCutlabsId, data) {
     sedDuration: e.lengthSec
   })))
   
-  for await(const { id, cutlabsId } of clips) {
+  await Promise.all(clips.map(async ({ id, cutlabsId }) => {
     await clipRepository.updateStatus(id, 'started');
     try {
       await cutlabsApi.downloadClip(cutlabsId, id);
       await clipRepository.updateStatus(id, 'downloaded')
     } catch (error) {
+      console.log("Error on download clip ", id, error)
       await clipRepository.updateStatus(id, 'failed');
     }
-  }
+  }))
 }
 
 module.exports = createMany;
