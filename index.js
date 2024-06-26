@@ -13,7 +13,7 @@ app.post('/video', async (req, res) => {
   const { url, cutlabsId } = req.body;  
   await videosServices.create({ url, cutlabsId });
 
-  req.statusCode(202);
+  res.status(202);
 });
 
 app.listen(port, () => {
