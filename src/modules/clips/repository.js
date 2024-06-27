@@ -45,8 +45,29 @@ async function findMany({ status } = {}) {
   })
 }
 
+async function findOneToPost(platform) {
+  return prismaClient.clip.findFirst({
+    where: {
+      posts: {
+        none: {
+          platform
+        }
+      }
+    },
+    orderBy: [
+      {
+        viralityScore: 'desc'
+      },
+      {
+        createdAt: 'asc'
+      }
+    ]
+  });
+}
+
 module.exports = {
   createManyIfNotExists,
   updateStatus,
-  findMany
+  findMany,
+  findOneToPost
 };
