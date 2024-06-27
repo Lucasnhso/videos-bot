@@ -1,21 +1,21 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const videosServices = require('./src/modules/videos/services')
-const port = 3333;
+const youtubeScrapper = require('./src/modules/youtube/scrapper');
+const routes = require('./src/routes');
+const port = 5000;
 
 const app = express();
 
 app.use(express.json());
 app.use(cors());
 
-app.post('/video', async (req, res) => {
-  const { url, cutlabsId } = req.body;  
-  await videosServices.create({ url, cutlabsId });
+app.use(routes);
 
-  res.status(202);
-});
-
-app.listen(port, () => {
+app.listen(port, async () => {
   console.log(`Server started on port ${port}`);
+
+  // await youtubeScrapper.execute('uploadVideo');
 })
+
+module.exports = app;
