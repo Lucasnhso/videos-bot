@@ -4,3 +4,5 @@ node_modules
 .env
 /data
 .vscode
+
+credentials/*.json
