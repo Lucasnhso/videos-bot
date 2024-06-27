@@ -1,5 +1,5 @@
-const CutlabsScrapper = require("../../cutlabs/Scrapper");
-const CutlabsApi = require('../../cutlabs/Api');
+const CutlabsScrapper = require("../../../providers/cutlabs/Scrapper");
+const CutlabsApi = require('../../../providers/cutlabs/Api');
 const videoRepository = require("../repository");
 const videoObserver = require('./observer');
 const clipServices = require('../../clips/services')

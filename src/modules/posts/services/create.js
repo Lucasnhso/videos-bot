@@ -2,7 +2,7 @@ const path = require('node:path');
 
 const postsRepository = require('../repository');
 const clipsRepository = require("../../clips/repository");
-const YoutubeClient = require("../../youtube/client");
+const YoutubeClient = require("../../../providers/youtube/client");
 
 async function create(platforms) {
   for(const platform of platforms) {

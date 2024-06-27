@@ -1,5 +1,5 @@
 const { EventEmitter} = require('node:events');
-const CutlabsApi = require('../../cutlabs/Api');
+const CutlabsApi = require('../../../providers/cutlabs/Api');
 const cutlabsApi = new CutlabsApi();
 
 class VideoObserver extends EventEmitter {

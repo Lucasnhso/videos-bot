@@ -1,4 +1,4 @@
-const CutlabsApi = require("../../cutlabs/Api");
+const CutlabsApi = require("../../../providers/cutlabs/Api");
 const clipRepository = require("../../clips/repository");
 const videoRepository = require("../../videos/repository");
 

@@ -63,7 +63,7 @@ class YoutubeClient {
   }
 
   async #createOAuthClient() {
-    const { web: credentials } = require('../../../credentials/google-youtube.json');
+    const { web: credentials } = require('../../../../credentials/google-youtube.json');
     this.#oAuthClient = new OAuth2(credentials.client_id, credentials.client_secret, credentials.redirect_uris[0]);
   }
 
