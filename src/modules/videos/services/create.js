@@ -2,7 +2,8 @@ const CutlabsScrapper = require("../../../providers/cutlabs/Scrapper");
 const CutlabsApi = require('../../../providers/cutlabs/Api');
 const videoRepository = require("../repository");
 const videoObserver = require('./observer');
-const clipServices = require('../../clips/services')
+const clipServices = require('../../clips/services');
+const { VIDEO_STATUS } = require("../../../utils/consts");
 
 const cutlabsApi = new CutlabsApi();
 const cutlabsScrapper = new CutlabsScrapper();
@@ -18,16 +19,16 @@ async function create({ url, cutlabsId }) {
     cutlabsId,
     title: project.title,
     url: project.inputUrl,
-    status: 'processing'
+    status: VIDEO_STATUS.PROCESSING
   });
 
   videoObserver
     .addToQueue(cutlabsId)
     .on('failed', async failedId => {
-      await videoRepository.updateStatus(failedId, 'failed');
+      await videoRepository.updateStatus(failedId, VIDEO_STATUS.PROCESSING);
     })
     .on('processed', async ({ clips, project: { sid }}) => {
-      await videoRepository.updateStatus(sid, 'processed');
+      await videoRepository.updateStatus(sid, VIDEO_STATUS.PROCESSED);
       await clipServices.createMany(sid, clips);
       console.log('Vídeo processado')
     })
