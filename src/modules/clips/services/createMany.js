@@ -1,10 +1,8 @@
-const CutlabsApi = require("../../../providers/cutlabs/Api");
 const { CLIP_STATUS } = require("../../../utils/consts");
-const logger = require("../../../utils/logger");
 const clipRepository = require("../../clips/repository");
 const videoRepository = require("../../videos/repository");
+const clipQueue = require("../queues");
 
-const cutlabsApi = new CutlabsApi();
 
 async function createMany(videoCutlabsId, data) {
   const video = await videoRepository.findByCutlabsId(videoCutlabsId);
@@ -20,18 +18,11 @@ async function createMany(videoCutlabsId, data) {
     status: CLIP_STATUS.PENDING,
     viralityScore: e.viralityScore,
     sedDuration: e.lengthSec
-  })))
-  
-  await Promise.all(clips.map(async ({ id, cutlabsId }) => {
-    await clipRepository.updateStatus(id, CLIP_STATUS.DOWNLOADING);
-    try {
-      await cutlabsApi.downloadClip(cutlabsId, id);
-      await clipRepository.updateStatus(id, CLIP_STATUS.DOWNLOADED)
-    } catch (error) {
-      logger.error("Error on download clip ", id, error)
-      await clipRepository.updateStatus(id, 'failed');
-    }
-  }))
+  })));
+
+  clips.forEach(clip => {
+    clipQueue.download.add(clip);
+  });
 }
 
 module.exports = createMany;

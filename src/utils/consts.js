@@ -7,7 +7,8 @@ const VIDEO_STATUS = {
 const CLIP_STATUS = {
   PENDING: 'pending',
   DOWNLOADING: 'downloading',
-  DOWNLOADED: 'donwloaded',
+  DOWNLOADED: 'downloaded',
+  DOWNLOAD_FAILED: 'download-failed',
   TRANSLATING: 'translating',
   TRANSLATED: 'translated',
   TAGGING: 'tagging',
