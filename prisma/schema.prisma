@@ -12,7 +12,7 @@ model Video {
   cutlabsId String @unique
   title     String
   url       String @unique
-  status    String //Transcribing Completed
+  status    String
   clips     Clip[]
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -30,7 +30,6 @@ model Clip {
   description   String
   status        String
   viralityScore Int
-  sedDuration   Int
   posts         Post[]
 
   createdAt DateTime @default(now()) @map("created_at")
