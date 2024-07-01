@@ -1,5 +1,6 @@
 const { google } = require('googleapis');
 const fs = require('node:fs');
+const path = require('node:path');
 const routes = require('../../routes');
 
 const youtube = google.youtube({ version: "v3"});
@@ -11,11 +12,9 @@ class YoutubeClient {
 
   }
   #oAuthClient;
+  #tokenPath = path.join(__dirname, '../../../credentials/youtube-token.json');
 
-  async uploadVideo(video, options = {
-    categoryId: '22',
-    tags: ['shorts']
-  }) {
+  async uploadVideo(video, { categoryId = '22', tags = ['shorts'], publishAt }) {
     await this.#authenticate();
 
     const videoFileSize = fs.statSync(video.path).size;
@@ -26,12 +25,12 @@ class YoutubeClient {
         snippet: {
           title: video.title,
           description: video.description,
-          tags: options.tags,
+          tags,
           // categoryId: options.categoryId,
         },
         status: {
-          privacyStatus: 'public',
-          ...(options.publishAt && { publishAt: options.publishAt })
+          privacyStatus: publishAt ? "private" : "public",
+          ...(publishAt && { publishAt })
         }
       },
       media: {
@@ -53,13 +52,48 @@ class YoutubeClient {
   }
 
   async #authenticate(){
-    await this.#requestUserConsent();
-    const authCode = await this.#waitForGoogleCallback();
-    await this.#requestGoogleForAccessTokens(authCode);
+    if (this.#hasValidToken()) {
+      await this.#loadSavedTokens();
+    } else {
+      await this.#requestUserConsent();
+      const authCode = await this.#waitForGoogleCallback();
+      await this.#requestGoogleForAccessTokens(authCode);
+      await this.#saveTokens();
+    }
 
     google.options({
       auth: this.#oAuthClient
-    })
+    });
+  }
+
+  #hasValidToken() {
+    try {
+      const tokens = require(this.#tokenPath);
+      this.#oAuthClient.setCredentials(tokens);
+      return this.#oAuthClient.credentials && this.#oAuthClient.credentials.expiry_date > Date.now();
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async #loadSavedTokens() {
+    const tokens = require(this.#tokenPath);
+    this.#oAuthClient.setCredentials(tokens);
+    console.log('> Tokens loaded from file.');
+
+    this.#oAuthClient.on('tokens', (tokens) => {
+      if (tokens.refresh_token) {
+        // Salva o novo refresh token se ele existir
+        fs.writeFileSync(this.#tokenPath, JSON.stringify(tokens));
+        console.log('> New tokens saved to file.');
+      }
+    });
+  }
+
+  async #saveTokens() {
+    const tokens = this.#oAuthClient.credentials;
+    fs.writeFileSync(this.#tokenPath, JSON.stringify(tokens));
+    console.log('> Tokens saved to file.');
   }
 
   async #createOAuthClient() {
