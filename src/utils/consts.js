@@ -4,6 +4,18 @@ const VIDEO_STATUS = {
   FAILED: 'failed'
 };
 
+const CLIP_STATUS = {
+  PENDING: 'pending',
+  DOWNLOADING: 'downloading',
+  DOWNLOADED: 'donwloaded',
+  TRANSLATING: 'translating',
+  TRANSLATED: 'translated',
+  TAGGING: 'tagging',
+  TAGGED: 'tagged',
+  AVAILABLE: 'available'
+}
+
 module.exports = {
-  VIDEO_STATUS
+  VIDEO_STATUS,
+  CLIP_STATUS
 }

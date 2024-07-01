@@ -1,4 +1,5 @@
 const CutlabsApi = require("../../../providers/cutlabs/Api");
+const { CLIP_STATUS } = require("../../../utils/consts");
 const clipRepository = require("../../clips/repository");
 const videoRepository = require("../../videos/repository");
 
@@ -15,16 +16,16 @@ async function createMany(videoCutlabsId, data) {
     cutlabsId: e.uuid,
     title: e.title,
     description: e.description,
-    status: 'pending',
+    status: CLIP_STATUS.PENDING,
     viralityScore: e.viralityScore,
     sedDuration: e.lengthSec
   })))
   
   await Promise.all(clips.map(async ({ id, cutlabsId }) => {
-    await clipRepository.updateStatus(id, 'started');
+    await clipRepository.updateStatus(id, CLIP_STATUS.DOWNLOADING);
     try {
       await cutlabsApi.downloadClip(cutlabsId, id);
-      await clipRepository.updateStatus(id, 'downloaded')
+      await clipRepository.updateStatus(id, CLIP_STATUS.DOWNLOADED)
     } catch (error) {
       console.log("Error on download clip ", id, error)
       await clipRepository.updateStatus(id, 'failed');
