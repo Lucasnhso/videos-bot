@@ -4,6 +4,7 @@ const videoRepository = require("../repository");
 const videoObserver = require('./observer');
 const clipServices = require('../../clips/services');
 const { VIDEO_STATUS } = require("../../../utils/consts");
+const logger = require("../../../utils/logger");
 
 const cutlabsApi = new CutlabsApi();
 const cutlabsScrapper = new CutlabsScrapper();
@@ -25,15 +26,16 @@ async function create({ url, cutlabsId }) {
   videoObserver
     .addToQueue(cutlabsId)
     .on('failed', async failedId => {
-      await videoRepository.updateStatus(failedId, VIDEO_STATUS.PROCESSING);
+      await videoRepository.updateStatus(failedId, VIDEO_STATUS.FAILED);
     })
     .on('processed', async ({ clips, project: { sid }}) => {
       await videoRepository.updateStatus(sid, VIDEO_STATUS.PROCESSED);
       await clipServices.createMany(sid, clips);
-      console.log('Vídeo processado')
+      logger.success('Vídeo processado')
     })
     .on('error', async e => {
-      console.log('Erro no processamento')
+      logger.error('Erro no processamento de video')
+      await videoRepository.updateStatus(failedId, VIDEO_STATUS.FAILED);
     })
   return createdVideo;
 }

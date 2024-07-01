@@ -1,5 +1,6 @@
 const CutlabsApi = require("../../../providers/cutlabs/Api");
 const { CLIP_STATUS } = require("../../../utils/consts");
+const logger = require("../../../utils/logger");
 const clipRepository = require("../../clips/repository");
 const videoRepository = require("../../videos/repository");
 
@@ -27,7 +28,7 @@ async function createMany(videoCutlabsId, data) {
       await cutlabsApi.downloadClip(cutlabsId, id);
       await clipRepository.updateStatus(id, CLIP_STATUS.DOWNLOADED)
     } catch (error) {
-      console.log("Error on download clip ", id, error)
+      logger.error("Error on download clip ", id, error)
       await clipRepository.updateStatus(id, 'failed');
     }
   }))
