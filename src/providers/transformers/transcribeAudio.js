@@ -1,5 +1,4 @@
 const fs = require('node:fs');
-const logger = require('../../utils/logger');
 const wavefile = require('wavefile');
 
 async function prepareAudio(audioPath) {
@@ -24,8 +23,6 @@ async function prepareAudio(audioPath) {
 }
 
 async function transcribeAudio(path) {
-  logger.info('> Start transcribe');
-
   const { pipeline } = await import('@xenova/transformers');
 
   const audioData = prepareAudio(path);
@@ -38,7 +35,6 @@ async function transcribeAudio(path) {
     stride_length_s: 5
   })
   
-  logger.success('> Transcribed');
   return text;
 }
 
