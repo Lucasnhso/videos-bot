@@ -6,7 +6,7 @@ const logger = require('../../utils/logger');
 const videoToAudio = (video) => new Promise((resolve, reject) => {
   logger.info('> Start convert video to audio')
   ffmpeg.setFfmpegPath(ffmpegStatic);
-  const fileName = path.basename(video).split('.')[0] + '.mp3';
+  const fileName = path.basename(video).split('.')[0] + '.wav';
 
   ffmpeg()
     .input(video)

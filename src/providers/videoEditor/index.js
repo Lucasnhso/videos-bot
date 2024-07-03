@@ -1,4 +1,4 @@
-const videoToAudio = require("./videoToMp3");
+const videoToAudio = require("./videoToAudio");
 
 module.exports = {
   videoToAudio
